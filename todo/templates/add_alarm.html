@@ -1,0 +1,11 @@
+<body>
+    <h1>Add Alarm</h1>
+    <form method="post">
+        {% csrf_token %}
+        <label for="id_time">Time:</label>
+        <input type="time" id="id_time" name="time">
+        <br>
+        <button type="submit">Set Alarm</button>
+    </form>
+    <a href="{% url 'alarm_list' %}">Back to Alarm List</a>
+</body>

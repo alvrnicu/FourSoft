@@ -3,6 +3,12 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from .forms import CreateUserForm, LoginForm, TaskForm
 from .models import Task
+from django.shortcuts import render
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
+from django.core.mail import send_mail
+from .models import Alarm
 
 def home(request):
     form = LoginForm()
@@ -83,4 +89,28 @@ def user_logout(request):
     logout(request)
     return redirect('home')
 
+def send_email_view(request):
+    if request.method == 'POST':
+        subject = 'Task Monitor App: Task Happening Soon'
+        message = 'You have a task coming up!'
+        from_email = 'foursoftfoursoft@example.com'
+        recipient_list = ['foursoftfoursoft@gmail.com']
 
+        send_mail(subject, message, from_email, recipient_list)
+        return HttpResponse('Email sent successfully')
+
+def alarm_list(request):
+    alarms = Alarm.objects.all()
+    return render(request, 'alarm_list.html', {'alarms': alarms})
+
+def add_alarm(request):
+    if request.method == 'POST':
+        time = request.POST['time']
+        alarm = Alarm.objects.create(time=time)
+        return redirect('alarm_list')
+    return render(request, 'add_alarm.html')
+
+def delete_alarm(request, pk):
+    alarm = Alarm.objects.get(pk=pk)
+    alarm.delete()
+    return redirect('alarm_list')
